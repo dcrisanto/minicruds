@@ -1,7 +1,7 @@
-const btnUpdate = document.getElementById('update');
-const btnDelete = document.getElementById('delete');
-window.onload = () => {
-    firebase.auth().onAuthStateChanged((user) =>{
+
+
+const observer =()=>{
+    firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             console.log('User is signed in.');
             login.classList.add("hiden");
@@ -17,15 +17,16 @@ window.onload = () => {
             bd.classList.add("hiden")
         }
     });
-}
-function writeUserData(userId, name, email, imageUrl) {
+}   
+
+const  writeUserData = (userId, name, email, imageUrl) =>{
     firebase.database().ref('users/' + userId).set({
         username: name,
         email: email,
         profile_picture: imageUrl
     });
 }
-function writeNewPost(uid, body) {
+const writeNewPost = (uid, body)=> {
     // A post entry.
     var postData = {
         uid: uid,
@@ -41,34 +42,71 @@ function writeNewPost(uid, body) {
     return newPostKey;
 }
 
-btnSave.addEventListener('click', () => {
-    var userId = firebase.auth().currentUser.uid;
-    const newPost = writeNewPost(userId, post.value);
-    posts.innerHTML += `
-    <div>
-        <textarea id="${newPost}">${post.value}</textarea>
-        <button id ="update" type="button">Update</button>
-        <button id="delete" type="button">Delete</button>
-    </div>`
-})
-btnDelete.addEventListener('click', (e) => {
-    e.preventDefault();
-    firebase.database().ref().child('/user-posts/' + userId + '/' + newPost).remove();
-    firebase.database().ref().child('posts/' + newPost).remove();
-    while (posts.firstChild) posts.removeChild(posts.firstChild);
-    console.log('El usuario esta eliminando  successfully!');
-    // reload_page();
-});
 
-btnUpdate.addEventListener('click', () => {
-    const newUpdate = document.getElementById(newPost);
-    const nuevoPost = {
-        body: newUpdate.value,
-    };
-    var updatesUser = {};
-    var updatesPost = {};
-    updatesUser['/user-posts/' + userId + '/' + newPost] = nuevoPost;
-    updatesPost['/posts/' + newPost] = nuevoPost;
-    firebase.database().ref().update(updatesUser);
-    firebase.database().ref().update(updatesPost);
-});
+const register = () => {
+    firebase.auth().createUserWithEmailAndPassword(email.value, password.value)
+        .then(() => {
+            console.log('Usuario Creado');
+        })
+        .catch(function (error) {
+            console.log(error.code, ' : ', error.message);
+        });
+}
+
+
+
+const startSession = () => {
+    firebase.auth().signInWithEmailAndPassword(email.value, password.value)
+        .then(() => {
+            console.log('Verificado')
+        })
+        .catch(function (error) {
+            console.log('Contraseña Incorrecta')
+        });
+}
+
+const logOut = () => {
+    firebase.auth().signOut().then(function () {
+        console.log('Cerro Sesión');
+    }).catch(function (error) {
+        console.log('Error al cerrar Sesión');
+    });
+}
+
+const facebook = () => {
+    var provider = new firebase.auth.FacebookAuthProvider();
+    provider.setCustomParameters({
+        'display': 'popup'
+    });
+    firebase.auth().signInWithPopup(provider)
+        .then(function (result) { console.log('Logueado con Fb') })
+        .catch(function (error) {
+            console.log(error.code);
+            console.log(error.message);
+            console.log(error.email);
+            console.log(error.credential);
+        });
+}
+
+const google = () => {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+        .then(function (result) {
+            console.log('Login Google');
+            var user = result.user;
+            writeUserData(user.uid, user.displayName, user.email, user.photoURL);
+        })
+        .catch(function (error) {
+            console.log(error.code);
+            console.log(error.message);
+            console.log(error.email);
+            console.log(error.credential);
+        });
+}
+
+/******************************************************************************************************************** */
+
+// function reload_page() {
+//   window.location.reload();
+// }
+/************************************************************** */
