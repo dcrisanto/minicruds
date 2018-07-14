@@ -14,10 +14,10 @@ const post = document.getElementById('post');
 const posts = document.getElementById('posts');
 
 
-
 window.onload = () => {
   observer();
 }
+
 btnRegister.addEventListener('click', () => {
   register();
 })

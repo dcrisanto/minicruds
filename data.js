@@ -1,9 +1,9 @@
 
-
 const observer =()=>{
     firebase.auth().onAuthStateChanged((user) => {
         if (user) {
             console.log('User is signed in.');
+            console.log(user);
             login.classList.add("hiden");
             bd.classList.remove("hiden");
             posts.classList.remove("hiden");
